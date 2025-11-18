@@ -1,0 +1,204 @@
+import { lineNumbers } from '@codemirror/view';
+// markdown-it中用于插入vue react组定义组件的插件
+import customComponentPlugin, {
+  type MDVueComponentOptions
+} from 'markdown-it-vue-component';
+import { createApp, shallowRef } from 'vue';
+import { MdEditor, config, XSSPlugin, editorExtensionsAttrs } from '~~/index';
+
+import App from './App';
+import MyCard from './components/my-card.vue';
+import MyChart from './components/my-chart.vue';
+import MyImg from './components/my-img.vue';
+import MyTable from './components/my-table.vue';
+import elementPlus from './element-plus';
+import './element-plus/element-theme.scss';
+// markdown-it中用于插入vue react组定义组件的插件样式
+import 'markdown-it-vue-component/style.css';
+
+// import TargetBlankExtension from './image/TargetBlankExtension.js';
+// import 'katex/dist/katex.min.css';
+
+// import { Extension } from '@codemirror/state';
+// import { autocompletion, CompletionContext } from '@codemirror/autocomplete';
+// import DDD from './.local/DDD.vue';
+// import screenfull from 'screenfull';
+// import katex from 'katex';
+// import Cropper from 'cropperjs';
+// import 'cropperjs/dist/cropper.css';
+// import mermaid from 'mermaid';
+// import highlight from 'highlight.js';
+// import 'highlight.js/styles/tokyo-night-dark.css';
+
+// import prettier from 'prettier';
+// import parserMarkdown from 'prettier/plugins/markdown';
+
+// import ancher from 'markdown-it-anchor';
+
+// import { cdnBase } from '~/config';
+
+// const myCompletions = (context: CompletionContext) => {
+//   const word = context.matchBefore(/@|\w*/);
+//   if (word!.from == word!.to && !context.explicit) return null;
+
+//   return {
+//     from: word!.from,
+//     options: [
+//       { label: '@imzbf', type: 'text' },
+//       { label: '@github', type: 'text' },
+//       { label: 'match', type: 'keyword' },
+//       { label: 'hello', type: 'variable', info: '(World)' },
+//       { label: 'helo', type: 'variable', info: '(MD)' },
+//       { label: 'magic', type: 'text', apply: '⠁⭒*.✩.*⭒⠁', detail: 'macro' }
+//     ]
+//   };
+// };
+
+config({
+  codeMirrorExtensions(extensions) {
+    // console.log(theme, extensions, keyBindings);
+
+    // return extensions;
+    return [
+      ...extensions,
+      {
+        type: 'lineNumbers',
+        extension: lineNumbers()
+      }
+    ].map((item) => {
+      if (item.type === 'linkShortener') {
+        return {
+          ...item,
+          options: {
+            // maxLength: 100
+          }
+        };
+      }
+
+      return item;
+    });
+  },
+  // iconfontType: 'class',
+  // markdownItConfig: (mdit) => {
+  // mdit.use(ancher, {
+  //   permalink: true
+  // });
+  markdownItPlugins(plugins, { editorId }) {
+    return [
+      ...plugins,
+      {
+        type: 'xss',
+        plugin: XSSPlugin,
+        options: {}
+      },
+      // 解析markdown中的自定义组件
+      {
+        type: 'customComponentPlugin',
+        plugin: customComponentPlugin,
+        options: {
+          components: {
+            'my-card': {
+              component: shallowRef(MyCard),
+              propsUseJson: true,
+              multipleProps: true
+            } as MDVueComponentOptions,
+            'my-chart': {
+              component: shallowRef(MyChart),
+              propsUseJson: true,
+              propsKey: 'data'
+            },
+            'my-table': {
+              component: shallowRef(MyTable),
+              propsUseJson: true,
+              propsKey: 'data'
+            },
+            img: {
+              component: shallowRef(MyImg)
+            }
+          }
+        }
+      }
+    ].map((item) => {
+      switch (item.type) {
+        case 'taskList': {
+          return {
+            ...item,
+            options: {
+              ...item.options,
+              enabled: editorId === 'md-prev'
+            }
+          };
+        }
+        case 'code': {
+          return {
+            ...item,
+            options: {
+              ...item.options,
+              extraTools: '<span class="extra-code-tools">额外的功能</span>'
+            }
+          };
+        }
+
+        case 'katex': {
+          return {
+            ...item,
+            options: {
+              ...item.options
+              // inlineDelimiters: [{ open: '$', close: '$' }]
+              // blockDelimiters: [
+              //   { open: '$$', close: '$$' },
+              //   { open: '$', close: '$' }
+              // ]
+            }
+          };
+        }
+
+        default: {
+          return item;
+        }
+      }
+    });
+  },
+
+  // mdit.use(TargetBlankExtension);
+  // },
+  mermaidConfig: (base) => {
+    return base;
+  },
+  editorConfig: {
+    // zIndex: 2000
+  },
+  editorExtensions: {
+    // prettier: {
+    //   prettierInstance: prettier,
+    //   parserMarkdownInstance: parserMarkdown
+    // },
+    // highlight: {
+    //   instance: highlight,
+    //   css: {
+    //     'tokyo-night': {
+    //       light: `${cdnBase}/highlight.js/11.5.1/styles/tokyo-night-light.min.css`,
+    //       dark: `${cdnBase}/highlight.js/11.5.1/styles/tokyo-night-dark.min.css`
+    //     }
+    //   }
+    // },
+    // screenfull: {
+    //   instance: screenfull
+    // },
+    // katex: {
+    //   instance: katex
+    // },
+    // cropper: {
+    //   instance: Cropper
+    // },
+    mermaid: {
+      //   instance: mermaid
+      enableZoom: true
+    }
+  },
+  editorExtensionsAttrs
+});
+
+import '~/styles/style.less';
+
+createApp(App).use(MdEditor).use(elementPlus).mount('#app');

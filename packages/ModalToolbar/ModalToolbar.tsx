@@ -1,0 +1,153 @@
+import { defineComponent, PropType, SetupContext, VNode, CSSProperties } from 'vue';
+import Modal from '~/components/Modal';
+import { prefix } from '~/config';
+import { PreviewThemes, Themes } from '~/type';
+import { getSlot } from '~/utils/vue-tsx';
+
+const props = {
+  title: {
+    type: String as PropType<string>,
+    default: ''
+  },
+  modalTitle: {
+    type: [String, Object] as PropType<string | VNode>,
+    default: ''
+  },
+  visible: {
+    type: Boolean as PropType<boolean>,
+    default: undefined
+  },
+  width: {
+    type: String as PropType<string>,
+    default: 'auto'
+  },
+  height: {
+    type: String as PropType<string>,
+    default: 'auto'
+  },
+  // 展示在工具栏的内容，通常是个图标
+  trigger: {
+    type: [String, Object] as PropType<string | VNode>,
+    default: undefined
+  },
+  onClick: {
+    type: Function as PropType<() => void>,
+    default: undefined
+  },
+  onClose: {
+    type: Function as PropType<() => void>,
+    default: undefined
+  },
+  /**
+   * 显示全屏按钮
+   */
+  showAdjust: {
+    type: Boolean as PropType<boolean>,
+    default: false
+  },
+  isFullscreen: {
+    type: Boolean as PropType<boolean>,
+    default: false
+  },
+  onAdjust: {
+    type: Function as PropType<(val: boolean) => void>,
+    default: undefined
+  },
+  class: {
+    type: String as PropType<string>,
+    default: undefined
+  },
+  style: {
+    type: [Object, String] as PropType<CSSProperties | string>,
+    default: undefined
+  },
+  showMask: {
+    type: Boolean as PropType<boolean>,
+    default: true
+  },
+  /**
+   * ==没有意义，仅用于规避克隆组件自动嵌入insert方法时，传入的是该组件而产生的waring
+   */
+  insert: {
+    type: Function as PropType<() => void>,
+    default: undefined
+  },
+  language: {
+    type: String as PropType<string>,
+    default: undefined
+  },
+  theme: {
+    type: String as PropType<Themes>,
+    default: undefined
+  },
+  previewTheme: {
+    type: String as PropType<PreviewThemes>,
+    default: undefined
+  },
+  codeTheme: {
+    type: String as PropType<string>,
+    default: undefined
+  },
+  disabled: {
+    type: Boolean as PropType<boolean>,
+    default: undefined
+  },
+  showToolbarName: {
+    type: Boolean as PropType<boolean>,
+    default: undefined
+  }
+  /**
+   * ==结束
+   */
+};
+
+export default defineComponent({
+  name: 'ModalToolbar',
+  props,
+  emits: ['onClick', 'onClose', 'onAdjust'],
+  setup(props, ctx: SetupContext<Array<'onClick' | 'onClose' | 'onAdjust'>>) {
+    return () => {
+      const Trigger = getSlot({ props, ctx }, 'trigger');
+      const ModalTitle = getSlot({ props, ctx }, 'modalTitle');
+      const Default = getSlot({ props, ctx });
+
+      return (
+        <>
+          <button
+            class={[`${prefix}-toolbar-item`, props.disabled && `${prefix}-disabled`]}
+            title={props.title}
+            disabled={props.disabled}
+            onClick={() => {
+              props.onClick?.();
+              ctx.emit('onClick');
+            }}
+            type="button"
+          >
+            {Trigger}
+          </button>
+          <Modal
+            style={props.style}
+            class={props.class}
+            width={props.width}
+            height={props.height}
+            title={ModalTitle}
+            visible={props.visible}
+            showMask={props.showMask}
+            onClose={() => {
+              props.onClose?.();
+              ctx.emit('onClose');
+            }}
+            showAdjust={props.showAdjust}
+            isFullscreen={props.isFullscreen}
+            onAdjust={(v) => {
+              props.onAdjust?.(v);
+              ctx.emit('onAdjust', v);
+            }}
+          >
+            {Default}
+          </Modal>
+        </>
+      );
+    };
+  }
+});

@@ -1,0 +1,80 @@
+import { defineComponent, ref, watch } from 'vue';
+import Header from './Header';
+import Preview from './Preview';
+import PreviewOnly from './PreviewOnly';
+import StreamDemo from './StreamDemo';
+
+// import VueTemplate from './VueTemplate.vue';
+
+import './style.less';
+
+export type Theme = 'dark' | 'light';
+
+export default defineComponent({
+  setup() {
+    const theme = ref<Theme>((localStorage.getItem('theme') as Theme) || 'light');
+    const previewTheme = ref<string>(localStorage.getItem('previewTheme') || 'default');
+    const codeTheme = ref<string>(localStorage.getItem('codeTheme') || 'atom');
+    const lang = ref<string>(localStorage.getItem('lang') || 'zh-CN');
+
+    watch([theme, previewTheme, codeTheme, lang], () => {
+      localStorage.setItem('theme', theme.value);
+      localStorage.setItem('previewTheme', previewTheme.value);
+      localStorage.setItem('codeTheme', codeTheme.value);
+      localStorage.setItem('lang', lang.value);
+    });
+
+    watch(
+      [theme],
+      () => {
+        document.body.setAttribute(
+          'class',
+          theme.value === 'dark' ? 'theme-dark' : 'theme-light'
+        );
+      },
+      { immediate: true }
+    );
+
+    return () => (
+      <div class={['app']}>
+        <Header
+          theme={theme.value}
+          onChange={(v: Theme) => (theme.value = v)}
+          onPreviewChange={(pt: string) => {
+            previewTheme.value = pt;
+          }}
+          onCodeThemeChange={(ct: string) => {
+            codeTheme.value = ct;
+          }}
+          onLangChange={(l) => {
+            lang.value = l;
+          }}
+        />
+        <div class="page-body">
+          <Preview
+            theme={theme.value}
+            previewTheme={previewTheme.value}
+            codeTheme={codeTheme.value}
+            lang={lang.value}
+          />
+
+          {/* <VueTemplate /> */}
+
+          <StreamDemo
+            theme={theme.value}
+            previewTheme={previewTheme.value}
+            codeTheme={codeTheme.value}
+            lang={lang.value}
+          />
+
+          <PreviewOnly
+            theme={theme.value}
+            previewTheme={previewTheme.value}
+            codeTheme={codeTheme.value}
+            lang={lang.value}
+          />
+        </div>
+      </div>
+    );
+  }
+});

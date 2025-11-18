@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "types": ["element-plus/global"],
+    "target": "ESNext",
+    "useDefineForClassFields": true,
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "strict": true,
+    "jsx": "preserve",
+    "jsxImportSource": "vue",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "lib": ["ESNext", "DOM"],
+    "skipLibCheck": true,
+    "noEmit": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["dev/*"],
+      "~~/*": ["packages/*"],
+      "~/*": ["packages/MdEditor/*"]
+    }
+  },
+  "include": [
+    "dev/**/*.ts",
+    "dev/**/*.tsx",
+    "dev/**/*.vue",
+    "packages/**/*.ts",
+    "packages/**/*.tsx"
+  ],
+  "references": [{ "path": "./tsconfig.node.json" }]
+}
