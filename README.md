@@ -1,6 +1,6 @@
 # 🎄 md-editor-v3-component
 
-English \| [中文](https://github.com/renqiankun/md-editor-v3-component/blob/develop/README-CN.md)
+English \| [中文](https://github.com/renqiankun/md-editor-v3-component/blob/main/README-CN.md)
 
 Based on the excellent open-source markdown editor [md-editor-v3](https://github.com/imzbf/md-editor-v3), integrated with the component encapsulated by [markdown-it-vue-component](https://github.com/renqiankun/markdown-it-vue-component-demo), supporting custom component insertion and enhanced custom component rendering functionality.
 
